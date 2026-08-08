@@ -1,0 +1,135 @@
+@import 'tailwindcss';
+
+/* ------------------------------------------------------------------
+   Dark trading tokens. High density, zero decorative chrome.
+   Chart colours were run through the palette validator against the
+   panel surface #111621 — see README "Chart palette".
+------------------------------------------------------------------ */
+@theme {
+  /* Named `plane`, not `base`: a `--color-base` token would make `text-base`
+     ambiguous with Tailwind's built-in font-size utility of the same name. */
+  --color-plane: #0b0e14;
+  --color-panel: #111621; /* card + chart surface */
+  --color-panel-2: #161d2b; /* row hover, input, header strip */
+  --color-line: #1e2635; /* hairline border */
+  --color-grid: #1a2231; /* gridline inside charts */
+
+  --color-ink: #e6edf7;
+  --color-ink-2: #8a97ad;
+  --color-ink-3: #5d6a80;
+
+  --color-accent: #38bdf8;
+  --color-warn: #f59e0b;
+
+  /* Call/put flow. deutan ΔE 7.4 — colour ALONE never distinguishes these;
+     every use pairs them with a CALL/PUT label or an up/down direction. */
+  --color-call: #22c55e;
+  --color-put: #ef4444;
+
+  /* Gamma regime diverging pair — passes every validator gate on this surface. */
+  --color-gamma-pos: #3b82f6;
+  --color-gamma-neg: #ea580c;
+
+  --font-sans: Inter, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'Cascadia Code', monospace;
+}
+
+@layer base {
+  html {
+    color-scheme: dark;
+  }
+
+  body {
+    @apply bg-plane text-ink font-sans antialiased;
+    overscroll-behavior-y: none;
+  }
+
+  /* Every price, premium and greek is monospace + tabular, always. */
+  .num {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+  }
+
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-accent;
+  }
+
+  ::-webkit-scrollbar {
+    width: 9px;
+    height: 9px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-line);
+    border-radius: 999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #2b3548;
+  }
+}
+
+@layer components {
+  .panel {
+    @apply bg-panel border-line rounded-lg border;
+  }
+
+  .panel-head {
+    @apply border-line flex items-center justify-between gap-3 border-b px-3 py-2;
+  }
+
+  .field {
+    @apply bg-panel-2 border-line text-ink placeholder:text-ink-3 rounded-md border px-2.5 py-1.5 text-sm
+           transition-colors outline-none focus:border-accent/60;
+  }
+
+  .btn-primary {
+    @apply bg-accent hover:bg-accent/90 disabled:cursor-not-allowed disabled:opacity-50
+           inline-flex items-center justify-center gap-2 rounded-md px-4 py-2.5 text-sm font-semibold transition-colors;
+    color: #06121c; /* dark ink on the light accent — 3:1+ either way */
+  }
+
+  .btn-ghost {
+    @apply text-ink-2 hover:bg-panel-2 hover:text-ink
+           inline-flex items-center justify-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-medium transition-colors;
+  }
+
+  .chip {
+    @apply inline-flex items-center gap-1.5 rounded px-1.5 py-0.5 text-[11px] font-semibold;
+  }
+}
+
+/* Flash-on-update, tape only. No animated transitions on live charts —
+   they read as lag. */
+@keyframes flash-call {
+  from {
+    background-color: color-mix(in srgb, var(--color-call) 22%, transparent);
+  }
+  to {
+    background-color: transparent;
+  }
+}
+@keyframes flash-put {
+  from {
+    background-color: color-mix(in srgb, var(--color-put) 22%, transparent);
+  }
+  to {
+    background-color: transparent;
+  }
+}
+.flash-call {
+  animation: flash-call 150ms ease-out;
+}
+.flash-put {
+  animation: flash-put 150ms ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
